@@ -1,3 +1,4 @@
+import random
 import telebot
 from telebot import types
 import os
@@ -21,14 +22,18 @@ def send_repo_link(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить изображение')
 def send_image(message):
-    photo_path = 'path/to/your/image.jpg'
-    with open(photo_path, 'rb') as photo:
+    photo_path = 'media/img'
+    imgs = os.listdir(photo_path)
+    rand_img = random.choice(imgs)
+    with open(os.path.join(photo_path, rand_img), 'rb') as photo:
         bot.send_photo(message.chat.id, photo)
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить аудио')
 def send_audio(message):
-    audio_path = 'path/to/your/audio.mp3'
-    with open(audio_path, 'rb') as audio:
-        bot.send_audio(message.chat.id, audio)
+    audio_path = 'media/audio'
+    audios = os.listdir(audio_path)
+    rand_audio = random.choice(audios)
+    with open(os.path.join(audio_path, rand_audio), 'rb') as audio:
+        bot.send_photo(message.chat.id, audio)
 
 bot.polling()
