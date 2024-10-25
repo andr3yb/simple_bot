@@ -17,7 +17,7 @@ def start_message(message):
 
 @bot.message_handler(commands=['repo'])
 def send_repo_link(message):
-    repo_link = "https://github.com/yourusername/yourrepo"
+    repo_link = "https://github.com/andr3yb/simple_bot"
     bot.send_message(message.chat.id, f"Вот ссылка на репозиторий: {repo_link}")
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить изображение')
