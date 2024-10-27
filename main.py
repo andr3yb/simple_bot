@@ -30,8 +30,10 @@ def send_image(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить аудио')
 def send_random_audio(message):
-    audio = open(r'media\audio\glass-clinking-241043.mp3', 'rb')
-    bot.send_audio(message.chat.id, audio)
-    audio.close()
+    audio_path = 'media/audio'
+    random_audio = random.choice(os.listdir(audio_path))
+    with open(os.path.join(audio_path, random_audio), 'rb') as audio:
+        bot.send_audio(message.chat.id, audio)
+
 
 bot.polling()
