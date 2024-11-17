@@ -23,6 +23,24 @@ def get_random_cat_image():
     else:
         raise Exception(f"Ошибка при обращении к The Cat API: {response.status_code}")
 
+import requests
+import random
+
+def get_random_sound():
+    url = "https://www.xeno-canto.org/api/2/recordings?query=cat"
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"Ошибка API xeno-canto: {response.status_code}")
+    
+    data = response.json()
+    if not data.get("recordings"):
+        raise Exception("Нет доступных записей.")
+    
+    # Случайный выбор записи
+    random_recording = random.choice(data["recordings"])
+    return random_recording["file"]  # Ссылка на аудиофайл
+
+
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -37,6 +55,12 @@ def send_repo_link(message):
     repo_link = "https://github.com/andr3yb/simple_bot"
     bot.send_message(message.chat.id, f"Ссылка на репозиторий: {repo_link}")
 
+@bot.message_handler(commands=['stop'])
+def stop(message):
+    bot.send_message(message.chat.id, "Бот остановлен. Чтобы запустить снова, отправьте /start.")
+    bot.send_message(message.chat.id, "Клавиатура скрыта.", reply_markup=telebot.types.ReplyKeyboardRemove())
+
+
 @bot.message_handler(func=lambda message: message.text == 'Отправить изображение')
 def send_image(message):
     try:
@@ -47,10 +71,19 @@ def send_image(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить аудио')
 def send_random_audio(message):
-    audio_path = 'media/audio'
-    random_audio = random.choice(os.listdir(audio_path))
-    with open(os.path.join(audio_path, random_audio), 'rb') as audio:
-        bot.send_audio(message.chat.id, audio)
+    try:
+        audio_url = get_random_sound()
+        bot.send_message(message.chat.id, f"Звук: {audio_url}")
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Ошибка: {e}")
+
+
+bot.set_my_commands([
+    telebot.types.BotCommand("start", "Запустить бота"),
+    telebot.types.BotCommand("stop", "Остановить бота"),
+    telebot.types.BotCommand("repo", "Ссылка на репозиторий"),
+])
+
 
 
 bot.polling()
