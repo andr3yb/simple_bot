@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 bot = telebot.TeleBot(os.getenv("BOT_TOKEN"))
-CATS_API_KEY = 'live_omXGz6EAeB2L6B235wBfCLOsfSzxo6GQPY8XPQLYbX6jstEBl3Qw6HZhiz66BnRJ'
+CATS_API_KEY = os.getenv("CATS_API_KEY")
 
 
 def get_random_cat_image():
