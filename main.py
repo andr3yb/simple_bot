@@ -1,11 +1,28 @@
-import random
 import telebot
 from telebot import types
 import os
+import random
+import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 load_dotenv()
 bot = telebot.TeleBot(os.getenv("BOT_TOKEN"))
+CATS_API_KEY = 'live_omXGz6EAeB2L6B235wBfCLOsfSzxo6GQPY8XPQLYbX6jstEBl3Qw6HZhiz66BnRJ'
+
+
+def get_random_cat_image():
+    url = "https://api.thecatapi.com/v1/images/search"
+    headers = {
+        "x-api-key": CATS_API_KEY
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        return data[0]["url"]
+    else:
+        raise Exception(f"Ошибка при обращении к The Cat API: {response.status_code}")
+
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -18,15 +35,15 @@ def start_message(message):
 @bot.message_handler(commands=['repo'])
 def send_repo_link(message):
     repo_link = "https://github.com/andr3yb/simple_bot"
-    bot.send_message(message.chat.id, f"Вот ссылка на репозиторий: {repo_link}")
+    bot.send_message(message.chat.id, f"Ссылка на репозиторий: {repo_link}")
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить изображение')
 def send_image(message):
-    photo_path = 'media/img'
-    imgs = os.listdir(photo_path)
-    rand_img = random.choice(imgs)
-    with open(os.path.join(photo_path, rand_img), 'rb') as photo:
-        bot.send_photo(message.chat.id, photo)
+    try:
+        image_url = get_random_cat_image()
+        bot.send_photo(message.chat.id, image_url)
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Ошибка при получении изображения: {e}")
 
 @bot.message_handler(func=lambda message: message.text == 'Отправить аудио')
 def send_random_audio(message):
